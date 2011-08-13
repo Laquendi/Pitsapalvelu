@@ -1,0 +1,19 @@
+%form{:method=>'post', :action=>'/admin/lista'}
+  .form
+    %label Nimi
+    %input{:type=>'text', :name=>'nimi'}
+  .form
+    %label Kuvaus
+    %input{:type=>'text', :name=>'kuvaus'}
+  .form
+    %label Prioriteetti
+    %select{:name=>'prioriteetti'}
+      -for i in (1..10)
+        %option= i
+  .form
+    %label Alkamisaika
+    %input{:type=>'text', :name=>'alku', :value=>'00:00'}
+  .form
+    %label Loppumisaika
+    %input{:type=>'text', :name=>'loppu', :value=>'00:00'}
+  %input{:type=>'submit', :value=>"Luo lista"}

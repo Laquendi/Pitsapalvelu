@@ -1,0 +1,30 @@
+%form{:method=>'post', :action=>"/admin/lista_tuotteet/#{@lista['id']}"}
+  %table
+    -@tuotteet.each do |tuote|
+      %tr
+        %td= tuote['nimi']
+        -if tuote['maaritelty']
+          %td
+            %label Määritelty
+            %input{:type=>'checkbox', :value=>"1", :name=>"tuotteet[#{tuote['id']}][maaritelty]", :checked=>"checked"}
+            %td
+              %label Saatavilla
+              -if tuote['saatavilla']
+                %input{:type=>'checkbox', :value=>"1", :name=>"tuotteet[#{tuote['id']}][saatavilla]", :checked=>'checked'}
+              -else
+                %input{:type=>'checkbox', :value=>"1", :name=>"tuotteet[#{tuote['id']}][saatavilla]"}
+            %td
+              %label Hinta
+              %input{:type=>'text', :name=>"tuotteet[#{tuote['id']}][hinta]", :value=>tuote['hinta']}
+        -else
+          %td
+            %label Määritelty
+            %input{:type=>'checkbox', :value=>"1", :name=>"tuotteet[#{tuote['id']}][maaritelty]"}
+          %td
+            %label Saatavilla
+            %input{:type=>'checkbox', :value=>"1", :name=>"tuotteet[#{tuote['id']}][saatavilla]"}
+          %td
+            %label Hinta
+            %input{:type=>'text', :name=>"tuotteet[#{tuote['id']}][hinta]"}
+  %input{:type=>'submit', :value=>'Päivitä lista'}
+    

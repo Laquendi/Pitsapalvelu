@@ -1,0 +1,14 @@
+%form{:method=>'post', :action=>'/admin/tuote'}
+  .field
+    %label Nimi
+    %input{:type=>'text', :name=>'nimi'}
+  .field
+    %label Kuvaus
+    %input{:type=>'text', :name=>'kuvaus'}
+  .field
+    %label Tuotetyyppi
+    %select{:name=>'tuotetyyppi'}
+      -@tuotetyypit.each do |tuotetyyppi|
+        %option= tuotetyyppi['nimi']
+  .actions
+    %input{:type=>'submit', :value=>'Lisää tuote'}

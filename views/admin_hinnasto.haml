@@ -1,0 +1,53 @@
+%a{:href=>'/admin/tuote'}Lisää tuote
+%a{:href=>'/admin/lista'}Lisää lista
+%h3 Tuotteet
+-@tuotetyypit.each do |tuotetyyppi|
+  %b= tuotetyyppi['nimi']
+  %table
+    %tr
+      %td Nimi
+      %td Kuvaus
+      -if tuotetyyppi['taytteet']
+        -for i in (1..4) do
+          %td= "Täyte #{i}"
+        %td Päivitä täytteet
+    -tuotetyyppi['tuotteet'].each do |tuote|
+      %form{:method=>'post', :action=>"/admin/taytteet/#{tuote['id']}"}
+        %tr
+          %td= tuote['nimi']
+          %td= tuote['kuvaus']
+          -if tuotetyyppi['taytteet']
+            -for i in (1..4) do
+              %td
+                -tayte = tuote['taytteet'][i-1]
+                -if tayte.nil?
+                  -tayte='Ei taytetta'
+                -else
+                  -tayte=tayte['nimi']
+                %select{:name=>"tayte#{i}"}
+                  -@taytteet.each do |tayte_vaihtoehto|
+                    -if tayte == tayte_vaihtoehto['nimi']
+                      %option{:selected=>"selected"}= tayte_vaihtoehto['nimi']
+                    -else
+                      %option= tayte_vaihtoehto['nimi']
+            %td
+              %input{:type=>'submit', :value=>'Päivitä'}
+%h3 Listat
+%table
+  %tr
+    %td Nimi
+    %td Kuvaus
+    %td alku
+    %td loppu
+    %td prioriteetti
+  -@listat.each do |lista|
+    %tr
+      %td= lista['nimi']
+      %td= lista['kuvaus']
+      %td= lista['alku']
+      %td= lista['loppu']
+      %td= lista['prioriteetti']
+      %td
+        %a{:href=>"/admin/lista_tuotteet/#{lista['id']}"}Muokkaa tuotteita
+      %td
+        %a{:href=>"/admin/lista/delete/#{lista['id']}", :onclick=>"return confirm('Haluatko varmasti poistaa listan?')"}Poista lista

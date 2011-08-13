@@ -1,0 +1,37 @@
+body
+{
+  background:#EEE;
+}
+#navigointi
+{
+  position:absolute;
+  width:18%;
+}
+
+#sisalto
+{
+  margin-left:20%;
+  margin-right:20%;
+}
+
+#pohja
+{
+  margin-left:20%;
+  margin-right:20%;
+  margin-top:100px;
+  border-style:solid;
+  border-width:1px;
+  border-radius:5px;
+}
+
+table
+{
+  border-style:solid;
+  border-width:1px;
+}
+
+td
+{
+  border-style:solid;
+  border-width:1px;
+}

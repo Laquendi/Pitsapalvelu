@@ -1,0 +1,20 @@
+%html
+  %head
+    %title Pitsapalvelu
+    %link{:rel=>'stylesheet', :href=>'/stylesheets/style.css', :type=>"text/css"}
+    %script{:type=>'text/javascript', :src=>'/scripts/pitsapalvelu.js'}
+  %body
+    #navigointi
+      %ul
+        %li
+          %a{:href=>"/"}Etusivu
+        %li
+          %a{:href=>"/hinnasto"}Hinnasto
+        %li
+          %a{:href=>"/yhteystiedot"}Yhteystiedot
+        %li
+          %a{:href=>"/kori"}Ostoskori
+    #sisalto
+      =yield
+    #pohja
+      Tsoha 2011

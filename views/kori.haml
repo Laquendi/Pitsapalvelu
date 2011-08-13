@@ -1,0 +1,9 @@
+%b Ostoskorin sisältö:
+-if @sisalto.empty?
+  %br Kori on tyhjä
+-else
+  %table
+    -@sisalto.each do |tuote|
+      %tr
+        %td= @tuotteet[tuote]['nimi']
+  %a{:href=>"hv"} Tilaa Tuotteet

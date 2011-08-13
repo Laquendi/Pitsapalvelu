@@ -1,0 +1,11 @@
+%form{:method=>'get', :action=>'/muutlistat'}
+  %select{:name=>'lista'}
+    -@listat.each do |lista|
+      %option= lista['nimi']
+  %input{:type=>'submit', :value=>"Näytä listä"}
+%h3= @lista['nimi']
+%table
+  -@tuotteet.each do |tuote|
+    %tr
+      %td= tuote['nimi']
+      %td= tuote['hinta']

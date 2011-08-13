@@ -1,0 +1,17 @@
+%h3= @lista['nimi']
+%p= @lista['kuvaus']
+%p 
+  ="Voimassa #{@lista['alku'].strftime('%H:%M')}-#{@lista['loppu'].strftime('%H:%M')}"
+  %br
+  %a{:href=>"/muutlistat/#{@lista['id']}"}Muiden aikojen listat
+%p
+-@tuotetyypit.each do |tuotetyyppi|
+  %b= tuotetyyppi['nimi']
+  %table
+    -tuotetyyppi['tuotteet'].each do |tuote|
+      %tr
+        %td= tuote['nimi']
+        %td= tuote['hinta']
+        %td
+          %a{:href=>"javascript:lisaa_keksiin('kori', #{tuote['id'].to_s})"} Lisää koriin
+    
