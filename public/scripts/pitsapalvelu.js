@@ -23,5 +23,5 @@ function lisaa_keksiin(keksi, lisays) {
 	rc = readCookie(keksi);
 	if (rc==null)
 		rc="";
-	createCookie(keksi, rc +" "+ lisays);
+	createCookie(keksi, rc + lisays);
 }

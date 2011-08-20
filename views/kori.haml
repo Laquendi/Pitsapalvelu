@@ -5,5 +5,18 @@
   %table
     -@sisalto.each do |tuote|
       %tr
-        %td= @tuotteet[tuote]['nimi']
+        %td= tuote[:nimi]
+        %td= tuote[:hinta]
+        -if tuote[:onko_lisukkeet]
+          %td 
+            -tuote[:lisukkeet].each do |i|
+              = @lisukkeet[i]
+          %td
+            %form{:method=>'post', :action=>"/kori/lisaa_lisuke/#{tuote[:indeksi]}"}
+              %select{:name=>'lisuke'}
+                -@lisukkeet.each do |id,lisuke|
+                  %option= lisuke
+              %input{:type=>'submit', :value=>'lisää'}
   %a{:href=>"hv"} Tilaa Tuotteet
+  %br
+    %a{:href=>"/kori/tyhjennys"} Tyhjennä kori

@@ -7,6 +7,7 @@ class Pitsapalvelu_admin < Sinatra::Base
   set :sessions, true
   set :static, true
   set :public, 'public'
+  set :haml, :layout => :admin_layout
 
   db = SQLite3::Database.new("database.db")
   db.type_translation = true
@@ -17,7 +18,7 @@ class Pitsapalvelu_admin < Sinatra::Base
   end
 
   get '/' do
-    haml :admin, :layout => :admin_layout
+    haml :admin
   end
   get '/hinnasto' do
     @tuotetyypit = db.execute("select id, nimi, taytteet from tuotetyyppi")
@@ -33,20 +34,20 @@ class Pitsapalvelu_admin < Sinatra::Base
     @taytteet.unshift({'nimi'=>'Ei taytetta'})
 
 	@listat = db.execute("select * from ruokalista;")
-    haml :admin_hinnasto, :layout => :admin_layout
+    haml :admin_hinnasto
   end
   get '/tilaukset' do
-    haml :admin_tilaukset, :layout => :admin_layout
+    haml :admin_tilaukset
   end
   get '/tuote' do
     @tuotetyypit = db.execute("select * from tuotetyyppi;")
-    haml :admin_tuote, :layout => :admin_layout
+    haml :admin_tuote
   end
   get '/lista' do
-    haml :admin_lista, :layout => :admin_layout
+    haml :admin_lista
   end
   get '/lista' do
-    haml :admin_lista, :layout => :admin_layout
+    haml :admin_lista
   end
   get '/lista_tuotteet/:lista' do
 	  @lista = db.get_first_row("select * from ruokalista where id=?;", params[:lista])
@@ -61,7 +62,7 @@ class Pitsapalvelu_admin < Sinatra::Base
           end
         end
       end
-	  haml :admin_lista_tuotteet, :layout => :admin_layout
+	  haml :admin_lista_tuotteet
   end
   get '/lista/delete/:lista' do
     db.execute("delete from ruokalista where id=?;", params[:lista])
