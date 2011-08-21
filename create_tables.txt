@@ -45,11 +45,11 @@ id integer not null primary key,
 kuvaus varchar(30)
 );
 create table ostos (
+id integer primary key,
 tilaus_id integer not null,
 tuote_id integer,
 ruokalista_id integer,
 hinta decimal,
-primary key (tilaus_id, tuote_id),
 foreign key (tilaus_id) references tilaus
 on delete cascade on update cascade,
 foreign key (tuote_id) references tuote
@@ -89,4 +89,13 @@ on delete set null on update cascade,
 foreign key(ostos_id) references ostos
 on delete cascade on update cascade
 );
-create view tuote_hinnat as select lj.tuote_id as tuote, lj.saatavilla as saatavilla, lj.hinta as hinta, rl.alku as alku, rl.loppu as loppu from lista_jasen lj, ruokalista rl where lj.ruokalista_id=rl.id order by rl.prioriteetti desc;
+create view tuote_hinnat as select 
+lj.tuote_id as tuote, 
+rl.id as lista, 
+lj.saatavilla as saatavilla, 
+lj.hinta as hinta, 
+rl.alku as alku, 
+rl.loppu as loppu 
+from lista_jasen lj, ruokalista rl 
+where lj.ruokalista_id=rl.id 
+order by rl.prioriteetti desc;

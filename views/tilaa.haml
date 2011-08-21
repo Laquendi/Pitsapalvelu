@@ -1,0 +1,39 @@
+-if @sisalto.empty?
+  %br Kori on tyhjä
+-else
+  %b Olet tilaamassa
+  %table
+    -@sisalto.each do |tuote|
+      %tr
+        %td= tuote[:nimi]
+        %td= tuote[:hinta]
+        %td 
+          -tuote[:lisukkeet].each do |i|
+            = @lisukkeet[i]
+    %tr
+      %td Summa
+      %td= @summa
+  %br
+  %form{:method=>'post', :action=>'/tilaa'}
+    .form
+      %label Nouto
+      %input{:type=>'radio', :name=>'toimitus', :value=>'0', :checked=>'checked'}
+      %label Kotiinkuljetus
+      %input{:type=>'radio', :name=>'toimitus', :value=>'1'}
+    .form
+      %label Nimi
+      %input{:type=>'text', :name=>'tilaaja_nimi'}
+    .form
+      %label Osoite
+      %input{:type=>'text', :name=>'tilaaja_osoite'}
+    .form
+      %label Puhelin
+      %input{:type=>'text', :name=>'tilaaja_puhelin'}
+    .form
+      %label Toimitusaika
+      %input{:type=>'text', :name=>'toimitusaika', :value=>@aika}
+    %br
+    .form
+      %label Lisätiedot
+      %textarea{:name=>'tilaaja_lisatiedot'}
+    %input{:type=>'submit', :value=>'Tilaa'}

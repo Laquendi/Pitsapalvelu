@@ -1,0 +1,17 @@
+%br= @tilaus['nimi']
+%br= @tilaus['toimitusaika']
+%br= @tilaus['kotiinkuljetus']?'Kotiinkuljetus':'Nouto'
+%br 
+  Tilauksen tila:
+  %b= @tila['kuvaus']
+%br
+%b Tuotteet
+%table
+  -@tuotteet.each do |tuote|
+    %tr
+      %td= @tuote_idt[tuote['id']]
+%p
+  Jos toimitukseen on yli puoli tuntia voi tilauksen perua
+-if @erotus>=30
+  %a{:href=>'/peru'} Peru tilaus
+  

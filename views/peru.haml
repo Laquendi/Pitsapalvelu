@@ -1,0 +1,6 @@
+-if !@tilaus
+  %b Ei ole tilausta mitä perua.
+-elsif @erotus < 30
+  %b Tilauksen voi perua vain jos toimitukseen on yli puoli tuntia.
+-else
+  Tilaus peruttu
