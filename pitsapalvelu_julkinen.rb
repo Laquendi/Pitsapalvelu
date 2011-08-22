@@ -39,7 +39,13 @@ class Pitsapalvelu_julkinen < Sinatra::Base
       tuote_hash = {:indeksi=>indeksi, :id=>tuote['id'].to_i, :lista=>hinta['lista'], :nimi=>tuote['nimi'], :hinta=>hinta['hinta'], :onko_lisukkeet=>tuote['lisukkeet']}
       tuote_lisukkeet=[]
       if tuote['lisukkeet']
+        idt.sort!
+        edellinen = -1
         idt.each{ |lisuke_id|
+          if lisuke_id == edellinen
+            next
+          end
+          edellinen = lisuke_id
           if $db.execute("select * from lisuke where id=?",lisuke_id)
             lopullinen_sisalto << "a#{lisuke_id}"
             tuote_lisukkeet << lisuke_id.to_i
@@ -66,22 +72,25 @@ class Pitsapalvelu_julkinen < Sinatra::Base
     aika = "#{Time.now.hour.to_s.rjust(2,'0')}:#{Time.now.min.to_s.rjust(2,'0')}"
     @lista = $db.get_first_row("select * from ruokalista where alku<? and loppu>? order by prioriteetti desc limit 1;", aika, aika)
     if !@lista
-        haml :hinnasto_suljettu
-    else
-      @tuotetyypit = $db.execute("select * from tuotetyyppi;")
-	  @tuotetyypit.each do |tuotetyyppi|
-        tuotetyyppi['tuotteet'] = $db.execute("select * from tuote where tuotetyyppi_id = ?;", tuotetyyppi['id'])
-        tuotetyyppi['tuotteet'].each do |tuote|
-          hinta = $db.get_first_row("select saatavilla, hinta from tuote_hinnat where tuote=? and alku<? and loppu>? limit 1;", tuote['id'], aika, aika)
-          if !hinta or !hinta['saatavilla']
-            tuotetyyppi.delete(tuote)
-	          next
-            end
-            tuote['hinta']=hinta['hinta']
-          end
-        end
-      haml :hinnasto
+      return haml :hinnasto_suljettu
     end
+    @tuotetyypit = $db.execute("select * from tuotetyyppi;")
+    @tuotetyypit.each do |tuotetyyppi|
+      tuotetyyppi['tuotteet'] = $db.execute("select * from tuote where tuotetyyppi_id = ?;", tuotetyyppi['id'])
+      tuotetyyppi['tuotteet'].delete_if { |tuote|
+        tuote[:hinta] = $db.get_first_row("select saatavilla, hinta from tuote_hinnat where tuote=? and alku<? and loppu>? limit 1;", tuote['id'], aika, aika)
+        !tuote[:hinta] or !tuote[:hinta]['saatavilla']
+      }
+      tuotetyyppi['tuotteet'].each do |tuote|
+        tuote[:hinta]=tuote[:hinta]['hinta']
+        tuote[:taytteet] = $db.execute("select * from tayte_tuote where tuote_id=?;", tuote['id'])
+      end
+    end
+    @tayte_idt = {}
+    $db.execute("select * from tayte;").each { |tayte|
+      @tayte_idt[tayte['id']]=tayte['nimi']
+    }
+      haml :hinnasto
   end
   get '/muutlistat/:lista' do
     @listat = $db.execute("select * from ruokalista;")
@@ -134,12 +143,12 @@ class Pitsapalvelu_julkinen < Sinatra::Base
   get '/seuranta' do
     tilaus_id = session[:tilaus]
     tilaus_id ||= -1
-    @tilaus = $db.get_first_row("select id, tila, nimi, osoite, toimitusaika from tilaus where id=?;", tilaus_id)
+    @tilaus = $db.get_first_row("select kotiinkuljetus, id, tila, nimi, osoite, toimitusaika from tilaus where id=?;", tilaus_id)
     unless @tilaus
       return haml :ei_seurattavaa
     end
     @tila = $db.get_first_row("select * from tilat where id=?;", @tilaus['tila'])
-    @tuotteet = $db.execute("select * from ostos where tilaus_id=?;", tilaus_id)
+    @ostokset = $db.execute("select * from ostos where tilaus_id=?;", tilaus_id)
     @summa = $db.get_first_value("select sum(hinta) from ostos where tilaus_id=?;", tilaus_id)
     @tuote_idt = {}
     $db.execute("select * from tuote;").each { |tuote|
@@ -197,9 +206,9 @@ class Pitsapalvelu_julkinen < Sinatra::Base
           return haml :tilaus_epaonnistui
       end
       if params[:toimitus] == '0'
-          kotiinkuljetus = 0
+          kotiinkuljetus = 'f'
       elsif params[:toimitus] == '1'
-          kotiinkuljetus = 1
+          kotiinkuljetus = 't'
       else
           @virhe = "Valitse joko nouto tai kotiinkuljetus"
           return haml :tilaus_epaonnistui
@@ -238,14 +247,14 @@ class Pitsapalvelu_julkinen < Sinatra::Base
       return haml :tilaus_epaonnistui
     end
     lisatiedot = params[:lisatiedot]
-    $db.execute("insert into tilaus(kotiinkuljetus,nimi,osoite,puhelin,toimitusaika,lisatiedot,tila,tilausaika) values(?,?,?,?,?,?,?,strftime('%s','now'));",
-              kotiinkuljetus, tilaaja_nimi, tilaaja_osoite, tilaaja_puhelin, toimitusaika, lisatiedot, 1);
+    $db.execute("insert into tilaus(kotiinkuljetus,nimi,osoite,puhelin,toimitusaika,lisatiedot,tila,tilausaika) values(?,?,?,?,?,?,?,datetime());",
+              kotiinkuljetus, tilaaja_nimi, tilaaja_osoite, tilaaja_puhelin, toimitusaika, lisatiedot, 1)
     id = $db.last_insert_row_id()
     sisalto.each { |tuote|
       $db.execute("insert into ostos(tilaus_id, tuote_id, ruokalista_id, hinta) values(?,?,?,?);", id, tuote[:id], tuote[:lista], tuote[:hinta])
-      tuote_id = $db.last_insert_row_id()
+      ostos_id = $db.last_insert_row_id()
       tuote[:lisukkeet].each { |lisuke|
-        $db.execute("insert into lisuke_ostos(lisuke_id, ostos_id) values(?,?);", lisuke, tuote_id)
+        $db.execute("insert into lisuke_ostos(lisuke_id, ostos_id) values(?,?);", lisuke, ostos_id)
       }
     }
     session[:tilaus]=id

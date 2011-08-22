@@ -1,0 +1,23 @@
+%table
+  %tr
+    %td id
+    %td tila
+    %td summa
+    %td maksettu
+    %td tilaajan nimi
+    %td tilausaika
+    %td toimitusaika
+    %td toimitustapa
+    %td tilaajan puhelin
+  -@tilaukset.each do |tilaus|
+    %tr
+      %td
+        %a{:href=>"/admin/tilaus/#{tilaus['id']}"}= tilaus['id']
+      %td= @tilat[tilaus['tila']]
+      %td= tilaus[:summa]
+      %td= tilaus['maksettu']
+      %td= tilaus['nimi']
+      %td= tilaus['tilausaika'].strftime("%d.%m.%y %H:%M")
+      %td= tilaus['toimitusaika'].strftime("%H:%M")
+      %td= tilaus['kotiinkuljetus']?"Kotiinkuljetus":"Nouto"
+      %td= tilaus['puhelin']

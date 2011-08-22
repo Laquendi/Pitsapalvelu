@@ -1,0 +1,14 @@
+#sivu
+{
+
+}
+#info
+{
+  position:absolute;
+  top:0;
+  right:0;
+}
+tr.eka td
+{
+  background-color:666666;
+}

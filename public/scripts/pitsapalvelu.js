@@ -19,9 +19,9 @@ function createCookie(name,value,days) {
     document.cookie = name+"="+value+expires+"; path=/";
 }
 
-function lisaa_keksiin(keksi, lisays) {
-	rc = readCookie(keksi);
+function lisaa_koriin(tuote) {
+	rc = readCookie('kori');
 	if (rc==null)
 		rc="";
-	createCookie(keksi, rc + lisays);
+	createCookie('kori', rc + tuote + 'b');
 }

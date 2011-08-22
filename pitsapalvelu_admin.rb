@@ -14,11 +14,103 @@ class Pitsapalvelu_admin < Sinatra::Base
   db.results_as_hash = true
 
   use Rack::Auth::Basic, "Restricted Area" do |username, password|
-	    [username, password] == ['admin', 'admin']
+	[username, password] == ['admin', 'admin']
   end
 
   get '/' do
+    @tilaukset = db.execute("select kotiinkuljetus, id, nimi, toimitusaika from tilaus where tila=? order by toimitusaika asc;", 1)
+    @tuote_idt = {}
+    db.execute("select * from tuote;").each { |tuote|
+      @tuote_idt[tuote['id']]=tuote['nimi']
+    }
+    @lisuke_idt = {}
+    db.execute("select * from lisuke;").each { |lisuke|
+      @lisuke_idt[lisuke['id']]=lisuke['nimi']
+    }
+    @tilaukset ||= []
+    @tilaukset.each { |tilaus|
+      tilaus[:ostot] = db.execute("select * from ostos where tilaus_id=?;", tilaus['id'])
+      tilaus[:ostot] ||= []
+      tilaus[:ostot].each { |ostos|
+        ostos[:lisukkeet] = db.execute("select * from lisuke_ostos where ostos_id=?;", ostos['id'])
+      }
+    }
     haml :admin
+  end
+  get '/tilaukset' do
+    @tilaukset = db.execute("select * from tilaus;")
+    @tilat = {}
+    @tilaukset.each{ |tilaus|
+      tilaus[:summa] = db.get_first_value("select sum(hinta) from ostos where tilaus_id=?;", tilaus['id'])
+    }
+    db.execute("select * from tilat;").each { |tila|
+      @tilat[tila['id']] = tila['kuvaus']
+    }
+    haml :admin_tilaukset
+  end
+  get '/tilaus/:id' do
+    @tilaus = db.get_first_row("select * from tilaus where id=?;", params[:id])
+    @tila = db.get_first_value("select kuvaus from tilat where id=?;", @tilaus['tila'])
+    @tilat = db.execute("select kuvaus from tilat")
+    @tuote_idt = {}
+    db.execute("select * from tuote;").each { |tuote|
+      @tuote_idt[tuote['id']]=tuote['nimi']
+    }
+    @lisuke_idt = {}
+    db.execute("select * from lisuke;").each { |lisuke|
+      @lisuke_idt[lisuke['id']]=lisuke['nimi']
+    }
+    @tilaus[:ostot] = db.execute("select * from ostos where tilaus_id=?;", @tilaus['id'])
+    @tilaus[:ostot] ||= []
+    @summa = 0.0
+    @tilaus[:ostot].each { |ostos|
+      ostos[:lisukkeet] = db.execute("select * from lisuke_ostos where ostos_id=?;", ostos['id'])
+      @summa += ostos['hinta']
+    } 
+    haml :admin_tilaus
+  end
+  get '/kuitti/:id' do
+    @tilaus = db.get_first_row("select * from tilaus where id=?;", params[:id])
+    @tuote_idt = {}
+    db.execute("select * from tuote;").each { |tuote|
+      @tuote_idt[tuote['id']]=tuote['nimi']
+    }
+    @lisuke_idt = {}
+    db.execute("select * from lisuke;").each { |lisuke|
+      @lisuke_idt[lisuke['id']]=lisuke['nimi']
+    }
+    @ruokalista_idt = {}
+    db.execute("select * from ruokalista;").each { |ruokalista|
+      @ruokalista_idt[ruokalista['id']]=ruokalista['nimi']
+    }
+    @tilaus[:ostot] = db.execute("select * from ostos where tilaus_id=?;", @tilaus['id'])
+    @tilaus[:ostot] ||= []
+    @summa = 0.0
+    @tilaus[:ostot].each { |ostos|
+      ostos[:lisukkeet] = db.execute("select * from lisuke_ostos where ostos_id=?;", ostos['id'])
+      @summa+=ostos['hinta']
+    } 
+    haml :admin_kuitti, :layout=>false
+  end
+  get '/tilaus_lista' do
+    @tilaukset = db.execute("select kotiinkuljetus, id, nimi, toimitusaika from tilaus where tila=? order by toimitusaika asc;", 1)
+    @tuote_idt = {}
+    db.execute("select * from tuote;").each { |tuote|
+      @tuote_idt[tuote['id']]=tuote['nimi']
+    }
+    @lisuke_idt = {}
+    db.execute("select * from lisuke;").each { |lisuke|
+      @lisuke_idt[lisuke['id']]=lisuke['nimi']
+    }
+    @tilaukset ||= []
+    @tilaukset.each { |tilaus|
+      tilaus[:ostot] = db.execute("select * from ostos where tilaus_id=?;", tilaus['id'])
+      tilaus[:ostot] ||= []
+      tilaus[:ostot].each { |ostos|
+        ostos[:lisukkeet] = db.execute("select * from lisuke_ostos where ostos_id=?;", ostos['id'])
+      }
+    }
+    haml :admin_tilaus_lista, :layout=>false
   end
   get '/hinnasto' do
     @tuotetyypit = db.execute("select id, nimi, taytteet from tuotetyyppi")
@@ -35,9 +127,6 @@ class Pitsapalvelu_admin < Sinatra::Base
 
 	@listat = db.execute("select * from ruokalista;")
     haml :admin_hinnasto
-  end
-  get '/tilaukset' do
-    haml :admin_tilaukset
   end
   get '/tuote' do
     @tuotetyypit = db.execute("select * from tuotetyyppi;")
@@ -100,5 +189,17 @@ class Pitsapalvelu_admin < Sinatra::Base
     end
     redirect '/admin/hinnasto'
   end
-
+  post '/tilaus/tila/:id' do
+    tila = db.get_first_value("select id from tilat where kuvaus=?;", params[:tila])
+    db.execute("update tilaus set tila=? where id=?;", tila, params[:id])
+    redirect "/admin/tilaus/#{params[:id]}"
+  end
+  post '/tilaus/muuta/:id' do
+    db.execute("update tilaus set muuta=? where id=?", params[:muuta], params[:id])
+    redirect "/admin/tilaus/#{params[:id]}"
+  end
+  post '/tilaus/maksettu/:id' do
+    db.execute("update tilaus set maksettu=? where id=?", params[:maksettu], params[:id])
+    redirect "/admin/tilaus/#{params[:id]}"
+  end
 end

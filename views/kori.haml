@@ -2,6 +2,7 @@
 -if @sisalto.empty?
   %br Kori on tyhjä
 -else
+  %br
   %a{:href=>"/kori/tyhjennys"} Tyhjennä kori
   %table
     -@sisalto.each do |tuote|
@@ -18,6 +19,9 @@
                 -@lisukkeet.each do |id,lisuke|
                   %option= lisuke
               %input{:type=>'submit', :value=>'lisää'}
+        -else
+          %td
+          %td
         %td
           %a{:href=>"/kori/poista/#{tuote[:indeksi]}"}poista tuote
     %tr

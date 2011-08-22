@@ -1,14 +1,6 @@
-%b Pitserian oma sivu
-
-%br
-%br Odottavat tilaukset:
--if @tilaukset.empty?
-  %br Ei tilauksia
--else
-  %a{:href=>"/admin/tilaus_lista"}Tulostettava lista
 -@tilaukset.each do |tilaus|
   %p
-    %a{:href=>"/admin/tilaus/#{tilaus['id']}"}= tilaus['toimitusaika'].strftime("%H:%M")
+    = tilaus['toimitusaika'].strftime("%H:%M")
     %br
     = tilaus['nimi']
     %br
@@ -20,4 +12,4 @@
           %td
             -ostos[:lisukkeet].each do |lisuke|
               =@lisuke_idt[lisuke[:lisuke_id]]
-
+  %br -----------------------------------

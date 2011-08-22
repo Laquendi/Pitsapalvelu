@@ -1,5 +1,5 @@
 %br= @tilaus['nimi']
-%br= @tilaus['toimitusaika']
+%br= "Toimitusaika: #{@tilaus['toimitusaika'].strftime("%H:%M")}"
 %br= @tilaus['kotiinkuljetus']?'Kotiinkuljetus':'Nouto'
 %br 
   Tilauksen tila:
@@ -7,9 +7,9 @@
 %br
 %b Tuotteet
 %table
-  -@tuotteet.each do |tuote|
+  -@ostokset.each do |ostos|
     %tr
-      %td= @tuote_idt[tuote['id']]
+      %td= @tuote_idt[ostos['tuote_id']]
 %p
   Jos toimitukseen on yli puoli tuntia voi tilauksen perua
 -if @erotus>=30

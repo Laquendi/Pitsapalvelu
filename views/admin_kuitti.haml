@@ -1,0 +1,33 @@
+%link{:rel=>'stylesheet', :href=>'/stylesheets/kuitti.css', :type=>"text/css"}
+#sivu
+  #yhteystiedot
+    Pitseria ei nimeä
+    %br 
+    Eikä myöskään osottetta
+    %br 
+    tai postinumeroa
+    %br 
+    tai edes puhelinnumeroa
+    %br
+    %br
+  #info
+    %br= "Kuitti #{@tilaus['id']}"  
+    %br= "Päiväys #{Time.now.strftime('%d.%m.%y')}"
+    %br= "Ostaja #{@tilaus['nimi']}"
+
+  %table
+    %tr.eka
+      %td Tuote
+      %td Lisukkeet
+      %td Hinta
+      %td Ruokalista
+    -@tilaus[:ostot].each do |ostos|
+      %tr
+        %td= @tuote_idt[ostos['tuote_id']]
+        %td
+          -ostos[:lisukkeet].each do |lisuke|
+            =@lisuke_idt[lisuke['id']]
+        %td= ostos['hinta']
+        %td= @ruokalista_idt[ostos['ruokalista_id']]
+  %pre ------------------
+  = "Summa #{@summa}"

@@ -1,0 +1,38 @@
+%br= "Tilaaja nimi: #{@tilaus['nimi']}"
+%br= "Tilaaja puhelin: #{@tilaus['puhelin']}"
+%br= "Tilaaja osoite: #{@tilaus['osoite']}"
+%br= "Tilauksen tila: #{@tila}"
+%br= "Toimitustapa: #{@tilaus['kotiinkuljetus']?"Kotiinkuljetus":"Nouto"}" 
+%br= "Tilausaika: #{@tilaus['tilausaika'].strftime("%d.%m.%y %H:%M")}"
+%br= "Toimitusaika: #{@tilaus['toimitusaika'].strftime("%H:%M")}"
+%br= "Lisatiedot: #{@tilaus['lisatiedot']}"
+%br= "Pitserian kommentti: #{@tilaus['muuta']}"
+%br
+  %a{:href=>"/admin/kuitti/#{@tilaus['id']}"}Tulostettava kuitti
+%br
+%form{:method=>'post', :action=>"/admin/tilaus/tila/#{@tilaus['id']}"}
+  %select{:name=>'tila'}
+    -@tilat.each do |tila|
+      %option= tila['kuvaus']
+  %input{:type=>'submit', :value=>"vaihda tila"}
+    
+%form{:method=>'post', :action=>"/admin/tilaus/muuta/#{@tilaus['id']}"}
+  %textarea{:name=>'muuta'}
+    =@tilaus['muuta']
+  %input{:type=>'submit', :value=>"vaihda kommentti"}
+%form{:method=>'post', :action=>"/admin/tilaus/maksettu/#{@tilaus['id']}"}
+  %input{:type=>'field',:name=>'maksettu', :value=>@tilaus['maksettu']}
+  %input{:type=>'submit', :value=>"vaihda maksettu summa"}
+%b Tuotteet:
+%table
+  -@tilaus[:ostot].each do |ostos|
+    %tr
+      %td= @tuote_idt[ostos['tuote_id']]
+      %td
+        -ostos[:lisukkeet].each do |lisuke|
+          =@lisuke_idt[lisuke[:lisuke_id]]
+  %tr
+    %td Yhteishinta
+    %td= @summa
+
+
