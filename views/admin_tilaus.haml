@@ -30,7 +30,7 @@
       %td= @tuote_idt[ostos['tuote_id']]
       %td
         -ostos[:lisukkeet].each do |lisuke|
-          =@lisuke_idt[lisuke[:lisuke_id]]
+          =@lisuke_idt[lisuke['lisuke_id']]
   %tr
     %td Yhteishinta
     %td= @summa
