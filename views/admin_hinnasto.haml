@@ -44,8 +44,8 @@
     %tr
       %td= lista['nimi']
       %td= lista['kuvaus']
-      %td= lista['alku']
-      %td= lista['loppu']
+      %td= lista['alku'].strftime("%H:%M")
+      %td= lista['loppu'].strftime("%H:%M")
       %td= lista['prioriteetti']
       %td
         %a{:href=>"/admin/lista_tuotteet/#{lista['id']}"}Muokkaa tuotteita

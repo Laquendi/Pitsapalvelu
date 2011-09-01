@@ -1,0 +1,11 @@
+20.7	1h	aiheen valinta ja github
+24.7	1h	suunnitteludokumentin määrittely
+30.7	2h	suunnitteludokumentti sql
+31.7	2h	suunnitteludokumentti loppuun
+12.8	2h  koodausta
+13.8	3h	koodausta
+20.8	3h	koodausta
+21.8	5h	koodausta
+22.8	4h  koodausta
+1.9		4h	vähän koodin modularisointia ja toteutusdokumenttia
+		27h

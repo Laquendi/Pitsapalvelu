@@ -8,8 +8,8 @@
     %table
       -tilaus[:ostot].each do |ostos|
         %tr
-          %td= @tuote_idt[ostos['tuote_id']]
+          %td= @idt[:tuote][ostos['tuote_id']]
           %td
             -ostos[:lisukkeet].each do |lisuke|
-              =@lisuke_idt[lisuke['lisuke_id']]
+              =@idt[:lisuke][lisuke['lisuke_id']]
   %br -----------------------------------
